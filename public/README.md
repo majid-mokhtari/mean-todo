@@ -1,5 +1,4 @@
-# angular-basics
-The Angular Basics course is taught in workspaces.  This is the code for the final course app.
+
 
 # set-up
 ```
