@@ -14,7 +14,7 @@ app.use('/', express.static('public'));
 // tell express to use body parser on POST
 app.use(parser.json());
 
-// add api namespace to avoid conflict
+// add api namespace to avoid path conflict
 app.use('/api', router);
 
 app.listen(3000, function(){

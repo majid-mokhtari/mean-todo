@@ -9,7 +9,16 @@ webpackJsonp([0],[
 var angular = __webpack_require__(0);
 
 angular.module('todoListApp')
-.controller('mainCtrl', function($scope, dataService){
+.controller('mainCtrl', function($scope, $log, $interval, dataService){
+
+  $scope.seconds = 0;
+
+  $scope.counter = function(){
+    $scope.seconds++;
+    $log.error($scope.seconds + ' have passed!');
+  }
+
+  $interval($scope.counter, 1000, 10);
 
   dataService.getTodos(function(response){
     var todos = response.data.todos;
@@ -37,16 +46,25 @@ angular.module('todoListApp')
     $scope.todos.splice(index, 1);
     dataService.deleteTodo(todo);
   };
-  
+
   $scope.saveTodos = function() {
     var filteredTodos = $scope.todos.filter(function(todo){
       if(todo.edited) {
         return todo
       };
     })
-    dataService.saveTodos(filteredTodos);
-  }; 
+    dataService.saveTodos(filteredTodos)
+    .finally($scope.resetTodoState());
+  };
+
+  $scope.resetTodoState = function(){
+    $scope.todos.forEach(function(todo){
+      todo.edited = false;
+    });
+  };
+
 });
+
 
 /***/ }),
 /* 3 */
@@ -72,7 +90,7 @@ angular.module('todoListApp')
 
 
 angular.module('todoListApp')
-.service('dataService', function($http) {
+.service('dataService', function($http, $q) {
   this.getTodos = function(cb) {
     $http.get('/api/todos').then(cb);
   };
@@ -82,7 +100,26 @@ angular.module('todoListApp')
   };
 
   this.saveTodos = function(todos) {
-    console.log("I saved " + todos.length + " todos!");
+    var queue = [];
+    todos.forEach(function(todo){
+      var request;
+      if(!todo._id){
+        //$http communicates with HTTP servers
+        request = $http.post('/api/todos', todo);
+      } else {
+        request = $http.put('/api/todos/' + todo._id, todo)
+        .then(function(result){
+          todo = result.data.todo;
+          return todo;
+        })
+      }
+      //push requests to $q provider
+      queue.push(request);
+    });
+    // $q resolves all promises before returning the results
+    return $q.all(queue).then(function(results){
+      console.log("I saved " + todos.length + " todos!");
+    });
   };
 
 });
