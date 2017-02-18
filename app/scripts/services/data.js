@@ -7,7 +7,10 @@ angular.module('todoListApp')
   };
 
   this.deleteTodo = function(todo) {
-    console.log("I deleted the " + todo.name + " todo!");
+    $http.delete('/api/todos/' + todo._id)
+    .then(function(result){
+      console.log("I deleted the " + todo.name + " todo!");
+    });
   };
 
   this.saveTodos = function(todos) {

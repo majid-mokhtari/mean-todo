@@ -2,8 +2,9 @@
 
 var express = require('express');
 var Todo = require('../models/todo');
-//var todos = require('../../mock/todos.json');
 var router = express.Router();
+
+// Add GET route to read new entries
 router.get('/todos', function(req, res){
   // pass empty obj to pull all data
   Todo.find({}, function(err, todos){
@@ -41,5 +42,14 @@ router.put('/todos/:id', function(req, res){
 });
 
 // Add DELETE route to delete entries
+router.delete('/todos/:id', function(req, res){
+  var id = req.params.id;
+  Todo.findByIdAndRemove(id, function(err){
+    if(err){
+      return res.status(500).json({err: err.message});
+    }
+    res.json({'todoId': id, message: 'Todo Deleted.'});
+  })
+});
 
 module.exports = router;

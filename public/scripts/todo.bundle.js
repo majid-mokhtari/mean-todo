@@ -11,14 +11,14 @@ var angular = __webpack_require__(0);
 angular.module('todoListApp')
 .controller('mainCtrl', function($scope, $log, $interval, dataService){
 
-  $scope.seconds = 0;
-
-  $scope.counter = function(){
-    $scope.seconds++;
-    $log.error($scope.seconds + ' have passed!');
-  }
-
-  $interval($scope.counter, 1000, 10);
+  // $scope.seconds = 0;
+  //
+  // $scope.counter = function(){
+  //   $scope.seconds++;
+  //   $log.error($scope.seconds + ' have passed!');
+  // }
+  //
+  // $interval($scope.counter, 1000, 10);
 
   dataService.getTodos(function(response){
     var todos = response.data.todos;
@@ -26,8 +26,7 @@ angular.module('todoListApp')
     });
 
   $scope.addTodo = function() {
-    $scope.todos.unshift({name: "This is a new todo.",
-                      completed: false});
+    $scope.todos.unshift({name: "This is a new todo.", completed: false});
   };
 
 })
@@ -42,6 +41,7 @@ angular.module('todoListApp')
 
 angular.module('todoListApp')
 .controller('todoCtrl', function($scope, dataService) {
+
   $scope.deleteTodo = function(todo, index) {
     $scope.todos.splice(index, 1);
     dataService.deleteTodo(todo);
@@ -96,7 +96,10 @@ angular.module('todoListApp')
   };
 
   this.deleteTodo = function(todo) {
-    console.log("I deleted the " + todo.name + " todo!");
+    $http.delete('/api/todos/' + todo._id)
+    .then(function(result){
+      console.log("I deleted the " + todo.name + " todo!");
+    });
   };
 
   this.saveTodos = function(todos) {
